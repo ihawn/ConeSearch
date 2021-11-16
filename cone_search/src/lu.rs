@@ -1,8 +1,8 @@
 use ndarray::{Array1, Array2};
 
-pub fn lu(a: Array2<f64>, b: Array1<f64>, n: usize) -> Array1<f64>
+pub fn lu_solve(a: Array2<f64>, b: Array1<f64>, n: usize) -> Array1<f64>
 {
-    let mut l: Array2<f64> = Array2::zeros((n,n));
+    let mut l: Array2<f64> = Array2::eye(n);
     let mut u: Array2<f64> = Array2::zeros((n,n));
 
     //LU
@@ -17,18 +17,14 @@ pub fn lu(a: Array2<f64>, b: Array1<f64>, n: usize) -> Array1<f64>
             }
             u[(i,k)] = a[(i,k)] - sum;
         }
-        for k in i..n
+        for k in i+1..n
         {
-            if i == k { l[(i,i)] = 1.0; }
-            else
+            let mut sum = 0.0;
+            for j in 0..i
             {
-                let mut sum = 0.0;
-                for j in 0..i
-                {
-                    sum += l[(k,j)]*u[(j,i)];
-                }
-                l[(k,i)] = (a[(k,i)] - sum) / u[(i,i)];
+                sum += l[(k,j)]*u[(j,i)];
             }
+            l[(k,i)] = (a[(k,i)] - sum) / u[(i,i)];
         }
     }
  
