@@ -1,0 +1,12 @@
+/home/ihawn/Documents/GitHub/ConeSearch/cone_search/target/debug/deps/xattr-6ffefaa75086e24f.rmeta: /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/lib.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/error.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/sys/mod.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/util.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/sys/linux_macos/mod.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/sys/linux_macos/linux.rs
+
+/home/ihawn/Documents/GitHub/ConeSearch/cone_search/target/debug/deps/libxattr-6ffefaa75086e24f.rlib: /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/lib.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/error.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/sys/mod.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/util.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/sys/linux_macos/mod.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/sys/linux_macos/linux.rs
+
+/home/ihawn/Documents/GitHub/ConeSearch/cone_search/target/debug/deps/xattr-6ffefaa75086e24f.d: /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/lib.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/error.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/sys/mod.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/util.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/sys/linux_macos/mod.rs /home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/sys/linux_macos/linux.rs
+
+/home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/lib.rs:
+/home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/error.rs:
+/home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/sys/mod.rs:
+/home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/util.rs:
+/home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/sys/linux_macos/mod.rs:
+/home/ihawn/.cargo/registry/src/github.com-1ecc6299db9ec823/xattr-0.2.2/src/sys/linux_macos/linux.rs:

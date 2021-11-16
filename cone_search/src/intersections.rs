@@ -1,9 +1,8 @@
 extern crate ndarray;
-extern crate ndarray_linalg;
 
 use ndarray::prelude::*;
-use ndarray_linalg::Solve;
 use crate::structs::{Hyperplane, Pyramid};
+use crate::lu::lu;
 
 //Function to generate all valid intersections given 3 pyramids. Should only be used in initial iteration
 pub fn intersect_pyramids(p1: Pyramid, p2: Pyramid, p3: Pyramid) -> Vec<[f64; 3]>
@@ -55,5 +54,5 @@ pub fn intersect_hyperplanes(h1: Hyperplane, h2: Hyperplane, h3: Hyperplane) -> 
         -h2.coeff[3],
         -h3.coeff[3]];
 
-    a.solve_into(b).unwrap()
+   lu(a, b, 3)
 }
