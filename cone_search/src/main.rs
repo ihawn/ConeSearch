@@ -1,26 +1,24 @@
 use structs::Hyperplane;
 use ndarray::*;
 
+use crate::pyramid_handler::generate_hyperplane;
+
 mod structs;
 mod lu;
 mod intersections;
 mod cone_search;
+mod pyramid_handler;
 
 
 fn main()
 {
-    //cone_search::solve();
-    let a: Array2<f64> = array![
-        [1.0, 2.0, 3.0],
-        [5.0, 6.0, 7.0],
-        [9.0, 10.0, 12.0]];
-
-    let b: Array1<f64> = array![
-        1.0,
-        2.0,
-        3.0
+    let x: Array2<f64> = array![
+        [2.0, -0.5, 0.0],
+        [1.0, -1.0, 4.6],
+        [-3.7, 4.2, 1.2]
     ];
 
-    let x = lu::lu_solve(a, b,3);
-    println!("{:?}", x);
+    let plane = generate_hyperplane(x, 0, 0);
+
+    println!("{:?}", plane.coeff);
 }

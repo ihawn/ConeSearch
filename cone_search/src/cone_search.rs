@@ -8,3 +8,8 @@ pub fn solve()
 
     //println!("{:?}", intersect_hyperplanes(h1, h2, h3));
 }
+
+pub fn f(x: [f64; 2]) -> f64
+{
+    x[0]*x[0] + x[1]*x[1]
+}
