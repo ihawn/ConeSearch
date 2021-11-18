@@ -42,7 +42,7 @@ pub fn intersect_pyramids(p1: Pyramid, p2: Pyramid, p3: Pyramid) -> Vec<Vec<f64>
     int_points
 }
 
-pub fn intersect_new_hyperplane(lst: Vec<Hyperplane>, pyr_lst: Vec<Pyramid>, pyr: Pyramid) -> Vec<Vec<f64>>
+pub fn intersect_new_hyperplane(lst: &Vec<Hyperplane>, pyr_lst: &Vec<Pyramid>, pyr: Pyramid) -> Vec<Vec<f64>>
 {
     let mut sect_lst: Vec<Vec<f64>> = vec![];
 
@@ -110,7 +110,7 @@ fn valid_intersection(p1: Pyramid, p2: Pyramid, p3: Pyramid, pt: &Array1<f64>) -
     f64::abs(pt[2] - t1) <= 1e-8_f64
 }
 
-pub fn prune_intersections(mut sects: Vec<Vec<f64>>, pyrs: Vec<Pyramid>) -> Vec<Vec<f64>>
+pub fn prune_intersections(mut sects: Vec<Vec<f64>>, pyrs: &Vec<Pyramid>) -> Vec<Vec<f64>>
 {
     for i in 0..pyrs.len()
     {

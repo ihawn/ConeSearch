@@ -17,3 +17,19 @@ pub struct Pyramid
     pub dist: f64, //distance to another pyramid. Sort of a temp variable but it's more convenient to store it here
     pub hyperplanes: [Hyperplane; 4]
 }
+
+#[derive(Copy, Clone)]
+pub struct Vector3
+{
+    pub x: f64,
+    pub y: f64,
+    pub z: f64
+}
+
+impl PartialEq for Vector3
+{
+    fn eq(&self, other: &Self) -> bool { self.x == other.x && self.y == other.y && self.z == other.z }
+}
+
+impl Eq for Vector3 {}
+
