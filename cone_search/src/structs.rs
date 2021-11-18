@@ -1,6 +1,7 @@
 //Structs to use throughout the program
+use std::{cmp::Ordering};
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct Hyperplane
 {
     pub parent_id: usize,
@@ -8,7 +9,8 @@ pub struct Hyperplane
     pub coeff: [f64; 4]
 }
 
-#[derive(Copy, Clone)]
+
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct Pyramid
 {
     pub id: usize,
@@ -18,7 +20,18 @@ pub struct Pyramid
     pub hyperplanes: [Hyperplane; 4]
 }
 
-#[derive(Copy, Clone)]
+impl Eq for Pyramid {}
+
+impl Ord for Pyramid
+{
+    fn cmp(&self, other: &Self) -> Ordering
+    {
+        self.dist.partial_cmp(&other.dist).unwrap().reverse()
+    }
+}
+
+
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct Vector3
 {
     pub x: f64,
@@ -26,10 +39,12 @@ pub struct Vector3
     pub z: f64
 }
 
-impl PartialEq for Vector3
-{
-    fn eq(&self, other: &Self) -> bool { self.x == other.x && self.y == other.y && self.z == other.z }
-}
-
 impl Eq for Vector3 {}
 
+impl Ord for Vector3
+{
+    fn cmp(&self, other: &Self) -> Ordering
+    {
+        self.z.partial_cmp(&other.z).unwrap().reverse()
+    }
+}
