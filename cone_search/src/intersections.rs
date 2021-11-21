@@ -61,25 +61,28 @@ pub fn intersect_new_hyperplane(lst: &Vec<Hyperplane>, pyr_lst: &Vec<Pyramid>, p
                         let pt = intersect_hyperplanes(lst[i], lst[j], pyr.hyperplanes[k]).to_vec();
                         let v: Vector3 = Vector3 {x: pt[0], y: pt[1], z: pt[2] };
                     
-                        if valid_intersection(pyr_lst[lst[i].parent_id], pyr_lst[lst[j].parent_id], pyr, &v) { sect_lst.push(v); }
+                        /*if valid_intersection(pyr_lst[lst[i].parent_id], pyr_lst[lst[j].parent_id], pyr, &v) { */sect_lst.push(v); //}
                     }
                 }
             }
         }
 
         //Two hyperplanes from the same pyramid
-
-        for k in 0..pyr.hyperplanes.len()
+        let mut offset: i32 = 1;
+        let mut k: i32 = 0;
+        while k < pyr.hyperplanes.len() as i32
         {
-            if lst[i].direction != pyr.hyperplanes[k].direction &&
-               lst[i].direction != pyr.hyperplanes[(k+1)%4].direction
+            if k == 3 { offset = -3; }
+            if lst[i].direction != pyr.hyperplanes[k as usize].direction &&
+               lst[i].direction != pyr.hyperplanes[(k+offset) as usize].direction
             {
-                let pt = intersect_hyperplanes(lst[i], pyr.hyperplanes[(k+1)%4], pyr.hyperplanes[k]).to_vec();
+                let pt = intersect_hyperplanes(lst[i], pyr.hyperplanes[k as usize], pyr.hyperplanes[(k+offset) as usize]).to_vec();
                 let v: Vector3 = Vector3 {x: pt[0], y: pt[1], z: pt[2] };
                     
-                if valid_intersection(pyr_lst[lst[i].parent_id], pyr, pyr, &v) { sect_lst.push(v); }
+                /*if valid_intersection(pyr_lst[lst[i].parent_id], pyr, pyr, &v) { */sect_lst.push(v);// }
              
             }
+            k+=1;
         }
     }
 
@@ -102,6 +105,7 @@ fn intersect_hyperplanes(h1: Hyperplane, h2: Hyperplane, h3: Hyperplane) -> Arra
    lu_solve(a, b, 3)
 }
 
+//Something's wrong with this method. Or not. It could be that the original intersections don't match. <- It's this not the first thing
 fn valid_intersection(p1: Pyramid, p2: Pyramid, p3: Pyramid, pt: &Vector3) -> bool
 {
     let t1: f64 = p1.peak[2] - p1.ell * f64::max(f64::abs(pt.x - p1.peak[0]), f64::abs(pt.y - p1.peak[1]));
@@ -109,8 +113,8 @@ fn valid_intersection(p1: Pyramid, p2: Pyramid, p3: Pyramid, pt: &Vector3) -> bo
     let t3: f64 = p3.peak[2] - p3.ell * f64::max(f64::abs(pt.x - p3.peak[0]), f64::abs(pt.y - p3.peak[1]));
 
     f64::abs(pt.z - t1) <= 1e-8_f64 &&
-    f64::abs(pt.z - t1) <= 1e-8_f64 &&
-    f64::abs(pt.z - t1) <= 1e-8_f64
+    f64::abs(pt.z - t2) <= 1e-8_f64 &&
+    f64::abs(pt.z - t3) <= 1e-8_f64
 }
 
 pub fn prune_intersections(mut sects: Vec<Vector3>, pyrs: &Vec<Pyramid>) -> Vec<Vector3>

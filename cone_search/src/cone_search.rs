@@ -37,7 +37,7 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
             let sects = intersect_new_hyperplane(&hyperplanes, &pyramids, pyramids[i]);
             for s in sects { intersections.push(s); }
 
-            intersections = prune_intersections(intersections.clone(), &pyramids);
+            //intersections = prune_intersections(intersections.clone(), &pyramids);
         }
     }
 
@@ -49,12 +49,14 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
 
 
 
-    for i in 0..10
+    for i in 0..0
     {
         let min_loc = min_sect(&intersections);
         let pt = intersections[min_loc];
         let fx = f([pt.x, pt.y]);
         let pyr: Pyramid = generate_pyramid([pt.x, pt.y, fx], ell, pyramids.len());
+
+        println!("{:?}", pt);
 
         if pt.z > lower_bound { lower_bound = pt.z; }
         if fx < upper_bound { upper_bound = fx; }
