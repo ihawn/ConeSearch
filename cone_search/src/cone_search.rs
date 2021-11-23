@@ -28,7 +28,7 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
             let sects = intersect_new_hyperplane(&hyperplanes, &pyramids, pyramids[i]);
             for s in sects { intersections.push(s); }
 
-            intersections = prune_intersections(intersections.clone(), &pyramids);
+            intersections = prune_intersections(intersections, &pyramids);
         }
     }
 
@@ -61,7 +61,7 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
 
         if (i+1)%100 == 0
         {
-            println!("\nIteration: {}\nLower Bound: {}\nUpper Bound: {}", i+1, lower_bound, upper_bound);
+            println!("\nIteration: {}\nLower Bound: {}\nUpper Bound: {}, Hyperplane Count: {}, Intersection Count: {}", i+1, lower_bound, upper_bound, hyperplanes.len(), intersections.len());
         }
     };
 }
@@ -107,7 +107,8 @@ fn get_adj_hyperplanes(mut pyrs: Vec<Pyramid>, pyr: Pyramid, adj_size: usize) ->
 
 pub fn f(x: [f64; 2]) -> f64
 {
-    0.05*(x[0]*x[0] + x[1]*x[1] + 15.0*f64::powf(f64::sin((x[0] - 2.0)*x[1]), 2.0))
+    x[0]*x[0] + x[1]*x[1]
+    //0.05*(x[0]*x[0] + x[1]*x[1] + 15.0*f64::powf(f64::sin((x[0] - 2.0)*x[1]), 2.0))
     //0.5*(f64::powi(x[0], 4) - 16.0*f64::powi(x[0], 2) + 5.0*x[0] + f64::powi(x[1], 4) - 16.0*f64::powi(x[1], 2) + 5.0*x[1]) //Styblinski–Tang function
     //f64::powi(f64::powi(x[0], 2) + x[1] - 11.0, 2) + f64::powi(f64::powi(x[1], 2) + x[0] - 7.0, 2)//Himmelblau
     //f64::sqrt(x[0]*x[0] + x[1]*x[1] + 5.0 * f64::powi(f64::sin((x[0]-2.0)*x[1]), 2))
