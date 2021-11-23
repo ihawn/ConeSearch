@@ -57,19 +57,19 @@ pub fn generate_pyramid(mut peak: [f64; 3], ell: f64, id: usize) -> Pyramid
     Pyramid{ id: id, peak: peak, ell: ell, dist: 0.0, hyperplanes: hyps }
 }
 
-pub fn combine_pyramids(pyr_lst: &Vec<Pyramid>) -> Vec<[Pyramid; 3]>
-{
-    let mut combos: Vec<[Pyramid; 3]> = vec![];
+// pub fn combine_pyramids(pyr_lst: &Vec<Pyramid>) -> Vec<[Pyramid; 3]>
+// {
+//     let mut combos: Vec<[Pyramid; 3]> = vec![];
 
-    for i in 0..pyr_lst.len()
-    {
-        for j in i+1..pyr_lst.len()
-        {
-            for k in j+1..pyr_lst.len()
-            {
-                combos.push([pyr_lst[i], pyr_lst[j], pyr_lst[k]]);
-            }
-        }
-    }
-    combos
-}
+//     for i in 0..pyr_lst.len()
+//     {
+//         for j in i+1..pyr_lst.len()
+//         {
+//             for k in j+1..pyr_lst.len()
+//             {
+//                 combos.push([pyr_lst[i], pyr_lst[j], pyr_lst[k]]);
+//             }
+//         }
+//     }
+//     combos
+// }

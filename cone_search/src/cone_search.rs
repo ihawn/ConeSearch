@@ -1,10 +1,10 @@
 use crate::structs::{Hyperplane, Pyramid, Vector3};
 use std::collections::BinaryHeap;
-use crate::pyramid_handler::{generate_pyramid, combine_pyramids};
-use crate::intersections::{intersect_new_hyperplane, intersect_pyramids, prune_intersections};
+use crate::pyramid_handler::{generate_pyramid};
+use crate::intersections::{intersect_new_hyperplane, prune_intersections};
 
 
-pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_threshold: usize)
+pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_threshold: usize, max_iter: usize)
 {
     //init
     let mut hyperplanes: Vec<Hyperplane> = vec![];
@@ -18,15 +18,6 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
     pyramids.push(generate_pyramid([x_bounds.1, y_bounds.1, 0.0], ell, 3));
 
 
-    // //Initial combinations of intersecting pyramids
-    // let combos = combine_pyramids(&pyramids);
-
-    // for i in 0..combos.len()
-    // {
-    //     let sects = intersect_pyramids(combos[i][0], combos[i][1], combos[i][2]);
-    //     for s in sects { intersections.push(s); }
-    // }
-
     //Add hyperplanes to the list
     for i in 0..pyramids.len()
     {
@@ -37,32 +28,24 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
             let sects = intersect_new_hyperplane(&hyperplanes, &pyramids, pyramids[i]);
             for s in sects { intersections.push(s); }
 
-            //intersections = prune_intersections(intersections.clone(), &pyramids);
+            intersections = prune_intersections(intersections.clone(), &pyramids);
         }
     }
 
-    for i in 0..intersections.len()
-    {
-        println!("{:?}", intersections[i]);
-    }
-    println!("{}", intersections.len());
 
 
-
-    for i in 0..0
+    for i in 0..max_iter
     {
         let min_loc = min_sect(&intersections);
         let pt = intersections[min_loc];
         let fx = f([pt.x, pt.y]);
         let pyr: Pyramid = generate_pyramid([pt.x, pt.y, fx], ell, pyramids.len());
 
-        println!("{:?}", pt);
-
         if pt.z > lower_bound { lower_bound = pt.z; }
         if fx < upper_bound { upper_bound = fx; }
 
         let ans = get_adj_hyperplanes(pyramids, pyr, closeness_threshold);
-        let mut close_hyps = ans.0; pyramids = ans.1;
+        let close_hyps = ans.0; pyramids = ans.1;
         let mut new_intersections = intersect_new_hyperplane(&close_hyps, &pyramids, pyr);
 
         for j in 0..pyr.hyperplanes.len()
@@ -74,8 +57,12 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
         let mut singleton = vec![]; singleton.push(pyr);
         intersections = prune_intersections(intersections, &singleton);
         intersections.append(&mut new_intersections);
+        pyramids.push(pyr);
 
-        println!("\nLower Bound: {}\nUpper Bound: {}", lower_bound, upper_bound);
+        if (i+1)%100 == 0
+        {
+            println!("\nIteration: {}\nLower Bound: {}\nUpper Bound: {}", i+1, lower_bound, upper_bound);
+        }
     };
 }
 
@@ -107,7 +94,7 @@ fn get_adj_hyperplanes(mut pyrs: Vec<Pyramid>, pyr: Pyramid, adj_size: usize) ->
         dist_heap.push(pyrs[i]);
     }
 
-    for i in 0..usize::min(adj_size, pyrs.len())
+    for _i in 0..usize::min(adj_size, pyrs.len())
     {
         let current = dist_heap.pop().unwrap();
         for j in 0..4
@@ -120,5 +107,8 @@ fn get_adj_hyperplanes(mut pyrs: Vec<Pyramid>, pyr: Pyramid, adj_size: usize) ->
 
 pub fn f(x: [f64; 2]) -> f64
 {
-    x[0]*x[0] + x[1]*x[1] + 2.0*f64::sin((x[0] - 2.0)*x[1])
+    0.05*(x[0]*x[0] + x[1]*x[1] + 15.0*f64::powf(f64::sin((x[0] - 2.0)*x[1]), 2.0))
+    //0.5*(f64::powi(x[0], 4) - 16.0*f64::powi(x[0], 2) + 5.0*x[0] + f64::powi(x[1], 4) - 16.0*f64::powi(x[1], 2) + 5.0*x[1]) //Styblinski–Tang function
+    //f64::powi(f64::powi(x[0], 2) + x[1] - 11.0, 2) + f64::powi(f64::powi(x[1], 2) + x[0] - 7.0, 2)//Himmelblau
+    //f64::sqrt(x[0]*x[0] + x[1]*x[1] + 5.0 * f64::powi(f64::sin((x[0]-2.0)*x[1]), 2))
 }
