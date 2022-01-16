@@ -7,5 +7,5 @@ mod pyramid_handler;
 
 fn main()
 {
-    cone_search::solve((-3.5, 4.5), (-2.9, 3.2), 16.0, 70, 5000);
+    cone_search::solve((-5.0, 5.0), (-5.0, 5.0), 6.5, 125, 5000);
 }

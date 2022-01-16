@@ -1,7 +1,9 @@
 use crate::structs::{Hyperplane, Pyramid, Vector3};
 use std::collections::BinaryHeap;
+use std::error::Error;
 use crate::pyramid_handler::{generate_pyramid};
 use crate::intersections::{intersect_new_hyperplane, prune_intersections};
+use csv;
 
 
 pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_threshold: usize, max_iter: usize)
@@ -12,6 +14,8 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
     let mut intersections: Vec<Vector3> = vec![];  
     let mut lower_bound = -1e10_f64;
     let mut upper_bound = 1e10_f64;
+    let mut best_loc = Vector3{x: 10.0, y: 10.0, z: 10.0};
+    let mut itt_sols: Vec<[f64; 2]> = vec!();
     pyramids.push(generate_pyramid([x_bounds.0, y_bounds.0, 0.0], ell, 0));
     pyramids.push(generate_pyramid([x_bounds.0, y_bounds.1, 0.0], ell, 1));
     pyramids.push(generate_pyramid([x_bounds.1, y_bounds.0, 0.0], ell, 2));
@@ -33,7 +37,6 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
     }
 
 
-
     for i in 0..max_iter
     {
         let min_loc = min_sect(&intersections);
@@ -42,7 +45,12 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
         let pyr: Pyramid = generate_pyramid([pt.x, pt.y, fx], ell, pyramids.len());
 
         if pt.z > lower_bound { lower_bound = pt.z; }
-        if fx < upper_bound { upper_bound = fx; }
+        if fx < upper_bound 
+        {
+            upper_bound = fx;
+            best_loc = pt;
+            itt_sols.push([pt.x, pt.y]);
+        }
 
         let ans = get_adj_hyperplanes(pyramids, pyr, closeness_threshold);
         let close_hyps = ans.0; pyramids = ans.1;
@@ -59,9 +67,19 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
         intersections.append(&mut new_intersections);
         pyramids.push(pyr);
 
-        if (i+1)%100 == 0
+        if (i+1)%10 == 0
         {
-            println!("\nIteration: {}\nLower Bound: {}\nUpper Bound: {}, Hyperplane Count: {}, Intersection Count: {}", i+1, lower_bound, upper_bound, hyperplanes.len(), intersections.len());
+            println!("\nIteration: {}\nLower Bound: {}\nUpper Bound: {}, \nHyperplane Count: {}, \nIntersection Count: {}, \nx1: {}, x2: {}, \nf(x): {}", i+1, lower_bound, upper_bound, hyperplanes.len(), intersections.len(), best_loc.x, best_loc.y, upper_bound);
+        }
+
+        if upper_bound - lower_bound < 0.01 && i > 100
+        {
+            let path = "C:/Users/Isaac/Documents/Optimization/NonConvex/NonConvexOptimization/NonConvexOptimiztion/BasinHopping/csv/ConeSearchDropWave.csv";
+            if let Err(e) = write_to_csv(path, itt_sols)
+            {
+                eprint!("{}", e);
+            }
+            break;
         }
     };
 }
@@ -107,9 +125,27 @@ fn get_adj_hyperplanes(mut pyrs: Vec<Pyramid>, pyr: Pyramid, adj_size: usize) ->
 
 pub fn f(x: [f64; 2]) -> f64
 {
-    x[0]*x[0] + x[1]*x[1]
+    let pi = 3.14159265358979;
+    //x[0]*x[0] + x[1]*x[1]
     //0.05*(x[0]*x[0] + x[1]*x[1] + 15.0*f64::powf(f64::sin((x[0] - 2.0)*x[1]), 2.0))
     //0.5*(f64::powi(x[0], 4) - 16.0*f64::powi(x[0], 2) + 5.0*x[0] + f64::powi(x[1], 4) - 16.0*f64::powi(x[1], 2) + 5.0*x[1]) //Styblinski–Tang function
     //f64::powi(f64::powi(x[0], 2) + x[1] - 11.0, 2) + f64::powi(f64::powi(x[1], 2) + x[0] - 7.0, 2)//Himmelblau
     //f64::sqrt(x[0]*x[0] + x[1]*x[1] + 5.0 * f64::powi(f64::sin((x[0]-2.0)*x[1]), 2))
+    //-20.0*f64::exp(-0.2*f64::sqrt(0.5*(f64::powf(x[0],2.0) + f64::powf(x[1],2.0)))) - f64::exp(0.5*(f64::cos(2.0*pi*x[0]) + f64::cos(2.0*pi*x[1]))) + 20.0 + f64::exp(1.0) //Ackley
+    -(1.0 + f64::cos(12.0*f64::sqrt(f64::powf(x[0], 2.0) + f64::powf(x[1], 2.0))))/(0.5*(f64::powf(x[0],2.0) + f64::powf(x[1], 2.0)) + 2.0) //Drop-Wave
+}
+
+fn write_to_csv(path: &str, xy: Vec<[f64; 2]>) -> Result<(), Box<dyn Error>>
+{
+    let mut writer = csv::Writer::from_path(path)?;
+
+    writer.write_record(&["x", "y"])?;
+
+    for i in 0..xy.len()
+    {
+        writer.write_record(&[xy[i][0].to_string(), xy[i][1].to_string()])?;
+    }
+    writer.flush()?;
+
+    Ok(())
 }
