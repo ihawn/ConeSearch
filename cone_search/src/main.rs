@@ -3,9 +3,11 @@ mod lu;
 mod intersections;
 mod cone_search;
 mod pyramid_handler;
-
+use std::time::Instant;
 
 fn main()
 {
-    cone_search::solve((-5.0, 5.0), (-5.0, 5.0), 6.5, 125, 5000);
+    let before = Instant::now();
+    cone_search::solve((-10.0, 10.0), (-10.0, 10.0), 20.0, 200, 5000);
+    println!("Elapsed time: {:.2?}", before.elapsed());
 }
