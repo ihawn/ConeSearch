@@ -78,7 +78,7 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
         }
     }
 
-    let path = "C:/Users/Isaac/Documents/Optimization/NonConvex/NonConvexOptimization/NonConvexOptimiztion/BasinHopping/csv/ConeSearchSchafferN2.csv";
+    let path = "C:/Users/Isaac/Documents/Optimization/NonConvex/NonConvexOptimization/NonConvexOptimiztion/BasinHopping/csv/ConeSearch.csv";
     if let Err(e) = write_to_csv(path, itt_sols)
     {
         eprint!("{}", e);
