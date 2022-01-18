@@ -1,6 +1,7 @@
 use crate::structs::{Hyperplane, Pyramid, Vector3};
 use std::collections::BinaryHeap;
 use std::error::Error;
+use std::time::Instant;
 use crate::pyramid_handler::{generate_pyramid};
 use crate::intersections::{intersect_new_hyperplane, prune_intersections};
 use csv;
@@ -16,6 +17,9 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
     let mut upper_bound = 1e10_f64;
     let mut best_loc = Vector3{x: 10.0, y: 10.0, z: 10.0};
     let mut itt_sols: Vec<[f64; 2]> = vec!();
+    let mut ab_diff: Vec<f64> = vec!();
+    let mut step_times: Vec<f64> = vec!();
+    let mut hyp_count: Vec<usize> = vec!();
     pyramids.push(generate_pyramid([x_bounds.0, y_bounds.0, 0.0], ell, 0));
     pyramids.push(generate_pyramid([x_bounds.0, y_bounds.1, 0.0], ell, 1));
     pyramids.push(generate_pyramid([x_bounds.1, y_bounds.0, 0.0], ell, 2));
@@ -36,6 +40,7 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
         }
     }
 
+    let mut time = Instant::now();
 
     for i in 0..max_iter
     {
@@ -50,6 +55,10 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
             upper_bound = fx;
             best_loc = pt;
             itt_sols.push([pt.x, pt.y]);
+            ab_diff.push(upper_bound - lower_bound);
+            step_times.push(time.elapsed().as_secs_f64());
+            time = Instant::now();
+            hyp_count.push(hyperplanes.len());
         }
 
         let ans = get_adj_hyperplanes(pyramids, pyr, closeness_threshold);
@@ -78,8 +87,8 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
         }
     }
 
-    let path = "C:/Users/Isaac/Documents/Optimization/NonConvex/NonConvexOptimization/NonConvexOptimiztion/BasinHopping/csv/ConeSearch.csv";
-    if let Err(e) = write_to_csv(path, itt_sols)
+    let path = "C:/Users/Isaac/Documents/Optimization/NonConvex/NonConvexOptimization/NonConvexOptimiztion/BasinHopping/csv/ConeSearchHimmelblau.csv";
+    if let Err(e) = write_to_csv(path, itt_sols, ab_diff, step_times, hyp_count)
     {
         eprint!("{}", e);
     }
@@ -134,20 +143,22 @@ pub fn f(x: [f64; 2]) -> f64
     //f64::sqrt(x[0]*x[0] + x[1]*x[1] + 5.0 * f64::powi(f64::sin((x[0]-2.0)*x[1]), 2))
     //-20.0*f64::exp(-0.2*f64::sqrt(0.5*(f64::powf(x[0],2.0) + f64::powf(x[1],2.0)))) - f64::exp(0.5*(f64::cos(2.0*pi*x[0]) + f64::cos(2.0*pi*x[1]))) + 20.0 + f64::exp(1.0) //Ackley
     //-(1.0 + f64::cos(12.0*f64::sqrt(f64::powf(x[0], 2.0) + f64::powf(x[1], 2.0))))/(0.5*(f64::powf(x[0],2.0) + f64::powf(x[1], 2.0)) + 2.0) //Drop-Wave
-    //(f64::powf(x[0], 2.0) + f64::powf(x[1], 2.0))/4000.0 - f64::cos(x[0])*f64::cos(x[1]/f64::sqrt(2.0)) + 1.0 //Griewank
+    //f64::powf(x[0], 2.0) + f64::powf(x[1], 2.0))/4000.0 - f64::cos(x[0])*f64::cos(x[1]/f64::sqrt(2.0)) + 1.0 //Griewank
     //-f64::cos(x[0])*f64::cos(x[1])*f64::exp(-f64::powf(x[0] - pi, 2.0) - f64::powf(x[1] - pi, 2.0)) //Easom
-    0.5 + (f64::powf(f64::sin(f64::powf(x[0], 2.0) - f64::powf(x[1], 2.0)), 2.0) - 0.5) / f64::powf(1.0 + 0.001*(f64::powf(x[1], 2.0) + f64::powf(x[1], 2.0)), 2.0)
+    //0.5 + (f64::powf(f64::sin(f64::powf(x[0], 2.0) - f64::powf(x[1], 2.0)), 2.0) - 0.5) / f64::powf(1.0 + 0.001*(f64::powf(x[1], 2.0) + f64::powf(x[1], 2.0)), 2.0) //Schaffer N. 2
+    //-(f64::sin(x[0])*f64::powf(f64::sin(f64::powf(x[0], 2.0)/pi), 2.0) + f64::sin(x[1])*f64::powf(f64::sin(2.0*f64::powf(x[1], 2.0)/pi), 2.0)) //Michalewicz
+    (f64::powf(f64::powf(x[0], 2.0) + x[1] - 11.0, 2.0) + f64::powf(x[0] + f64::powf(x[1], 2.0) - 7.0, 2.0)) / 1000.0
 }
 
-fn write_to_csv(path: &str, xy: Vec<[f64; 2]>) -> Result<(), Box<dyn Error>>
+fn write_to_csv(path: &str, xy: Vec<[f64; 2]>, alpha_beta: Vec<f64>, step_time: Vec<f64>, hyp_count: Vec<usize>) -> Result<(), Box<dyn Error>>
 {
     let mut writer = csv::Writer::from_path(path)?;
 
-    writer.write_record(&["x", "y"])?;
+    writer.write_record(&["x", "y", "ab_diff", "step_time", "hyp_count"])?;
 
     for i in 0..xy.len()
     {
-        writer.write_record(&[xy[i][0].to_string(), xy[i][1].to_string()])?;
+        writer.write_record(&[xy[i][0].to_string(), xy[i][1].to_string(), alpha_beta[i].to_string(), step_time[i].to_string(), hyp_count[i].to_string()])?;
     }
     writer.flush()?;
 
