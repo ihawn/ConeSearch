@@ -143,11 +143,12 @@ pub fn f(x: [f64; 2]) -> f64
     //f64::sqrt(x[0]*x[0] + x[1]*x[1] + 5.0 * f64::powi(f64::sin((x[0]-2.0)*x[1]), 2))
     //-20.0*f64::exp(-0.2*f64::sqrt(0.5*(f64::powf(x[0],2.0) + f64::powf(x[1],2.0)))) - f64::exp(0.5*(f64::cos(2.0*pi*x[0]) + f64::cos(2.0*pi*x[1]))) + 20.0 + f64::exp(1.0) //Ackley
     //-(1.0 + f64::cos(12.0*f64::sqrt(f64::powf(x[0], 2.0) + f64::powf(x[1], 2.0))))/(0.5*(f64::powf(x[0],2.0) + f64::powf(x[1], 2.0)) + 2.0) //Drop-Wave
-    //f64::powf(x[0], 2.0) + f64::powf(x[1], 2.0))/4000.0 - f64::cos(x[0])*f64::cos(x[1]/f64::sqrt(2.0)) + 1.0 //Griewank
+    //(f64::powf(x[0], 2.0) + f64::powf(x[1], 2.0))/4000.0 - f64::cos(x[0])*f64::cos(x[1]/f64::sqrt(2.0)) + 1.0 //Griewank
     //-f64::cos(x[0])*f64::cos(x[1])*f64::exp(-f64::powf(x[0] - pi, 2.0) - f64::powf(x[1] - pi, 2.0)) //Easom
     //0.5 + (f64::powf(f64::sin(f64::powf(x[0], 2.0) - f64::powf(x[1], 2.0)), 2.0) - 0.5) / f64::powf(1.0 + 0.001*(f64::powf(x[1], 2.0) + f64::powf(x[1], 2.0)), 2.0) //Schaffer N. 2
     //-(f64::sin(x[0])*f64::powf(f64::sin(f64::powf(x[0], 2.0)/pi), 2.0) + f64::sin(x[1])*f64::powf(f64::sin(2.0*f64::powf(x[1], 2.0)/pi), 2.0)) //Michalewicz
-    (f64::powf(f64::powf(x[0], 2.0) + x[1] - 11.0, 2.0) + f64::powf(x[0] + f64::powf(x[1], 2.0) - 7.0, 2.0)) / 1000.0
+    //(f64::powf(f64::powf(x[0], 2.0) + x[1] - 11.0, 2.0) + f64::powf(x[0] + f64::powf(x[1], 2.0) - 7.0, 2.0)) / 1000.0 //Himm
+    //20.0 + f64::powf(x[0], 2.0) - 10.0*f64::cos(2.0*pi*x[0]) + f64::powf(x[1], 2.0) - 10.0*f64::cos(2.0*pi*x[1]) //Rastrigin
 }
 
 fn write_to_csv(path: &str, xy: Vec<[f64; 2]>, alpha_beta: Vec<f64>, step_time: Vec<f64>, hyp_count: Vec<usize>) -> Result<(), Box<dyn Error>>
