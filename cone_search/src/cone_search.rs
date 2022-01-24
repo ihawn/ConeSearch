@@ -83,11 +83,15 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
 
         if upper_bound - lower_bound < 0.01 && i > 100
         {
+            itt_sols.push([best_loc.x, best_loc.y]);
+            ab_diff.push(upper_bound - lower_bound);
+            hyp_count.push(hyperplanes.len());           
+            step_times.push(time.elapsed().as_secs_f64());
             break;
         }
     }
 
-    let path = "C:/Users/Isaac/Documents/Optimization/NonConvex/NonConvexOptimization/NonConvexOptimiztion/BasinHopping/csv/ConeSearchHimmelblau.csv";
+    let path = "C:/Users/Isaac/Documents/Optimization/NonConvex/NonConvexOptimization/NonConvexOptimiztion/BasinHopping/csv/ConeSearchRastrigin.csv";
     if let Err(e) = write_to_csv(path, itt_sols, ab_diff, step_times, hyp_count)
     {
         eprint!("{}", e);
@@ -147,8 +151,13 @@ pub fn f(x: [f64; 2]) -> f64
     //-f64::cos(x[0])*f64::cos(x[1])*f64::exp(-f64::powf(x[0] - pi, 2.0) - f64::powf(x[1] - pi, 2.0)) //Easom
     //0.5 + (f64::powf(f64::sin(f64::powf(x[0], 2.0) - f64::powf(x[1], 2.0)), 2.0) - 0.5) / f64::powf(1.0 + 0.001*(f64::powf(x[1], 2.0) + f64::powf(x[1], 2.0)), 2.0) //Schaffer N. 2
     //-(f64::sin(x[0])*f64::powf(f64::sin(f64::powf(x[0], 2.0)/pi), 2.0) + f64::sin(x[1])*f64::powf(f64::sin(2.0*f64::powf(x[1], 2.0)/pi), 2.0)) //Michalewicz
-    //(f64::powf(f64::powf(x[0], 2.0) + x[1] - 11.0, 2.0) + f64::powf(x[0] + f64::powf(x[1], 2.0) - 7.0, 2.0)) / 1000.0 //Himm
+    (f64::powf(f64::powf(x[0], 2.0) + x[1] - 11.0, 2.0) + f64::powf(x[0] + f64::powf(x[1], 2.0) - 7.0, 2.0)) / 1000.0 //Himm
     //20.0 + f64::powf(x[0], 2.0) - 10.0*f64::cos(2.0*pi*x[0]) + f64::powf(x[1], 2.0) - 10.0*f64::cos(2.0*pi*x[1]) //Rastrigin
+}
+
+pub fn f2(x: [f64; 2], n: f64) -> f64
+{
+    n*(f64::powf(x[0], 2.0) + f64::powf(x[1], 2.0))
 }
 
 fn write_to_csv(path: &str, xy: Vec<[f64; 2]>, alpha_beta: Vec<f64>, step_time: Vec<f64>, hyp_count: Vec<usize>) -> Result<(), Box<dyn Error>>
