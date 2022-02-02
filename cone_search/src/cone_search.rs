@@ -151,8 +151,8 @@ pub fn f(x: [f64; 2]) -> f64
     //-f64::cos(x[0])*f64::cos(x[1])*f64::exp(-f64::powf(x[0] - pi, 2.0) - f64::powf(x[1] - pi, 2.0)) //Easom
     //0.5 + (f64::powf(f64::sin(f64::powf(x[0], 2.0) - f64::powf(x[1], 2.0)), 2.0) - 0.5) / f64::powf(1.0 + 0.001*(f64::powf(x[1], 2.0) + f64::powf(x[1], 2.0)), 2.0) //Schaffer N. 2
     //-(f64::sin(x[0])*f64::powf(f64::sin(f64::powf(x[0], 2.0)/pi), 2.0) + f64::sin(x[1])*f64::powf(f64::sin(2.0*f64::powf(x[1], 2.0)/pi), 2.0)) //Michalewicz
-    (f64::powf(f64::powf(x[0], 2.0) + x[1] - 11.0, 2.0) + f64::powf(x[0] + f64::powf(x[1], 2.0) - 7.0, 2.0)) / 1000.0 //Himm
-    //20.0 + f64::powf(x[0], 2.0) - 10.0*f64::cos(2.0*pi*x[0]) + f64::powf(x[1], 2.0) - 10.0*f64::cos(2.0*pi*x[1]) //Rastrigin
+    //(f64::powf(f64::powf(x[0], 2.0) + x[1] - 11.0, 2.0) + f64::powf(x[0] + f64::powf(x[1], 2.0) - 7.0, 2.0)) / 1000.0 //Himm
+    20.0 + f64::powf(x[0], 2.0) - 10.0*f64::cos(2.0*pi*x[0]) + f64::powf(x[1], 2.0) - 10.0*f64::cos(2.0*pi*x[1]) //Rastrigin
 }
 
 pub fn f2(x: [f64; 2], n: f64) -> f64
