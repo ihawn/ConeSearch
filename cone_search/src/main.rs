@@ -11,7 +11,7 @@ use std::error::Error;
 fn main()
 {
     let before = Instant::now();
-    cone_search::solve((-8.0, 7.0), (-9.0, 10.0), 250.0, 20, 100000);
+    cone_search::solve((-8.0, 7.0), (-9.0, 10.0), 150.0, 80, 2500);
     println!("Elapsed time: {:.2?}", before.elapsed());
     io::stdin().read_line(&mut String::new()).unwrap();
 

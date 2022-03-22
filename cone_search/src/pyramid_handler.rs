@@ -22,9 +22,9 @@ pub fn generate_hyperplane(x: Array2<f64>, par_id: usize, direction: u8) -> Hype
     Hyperplane{ parent_id: par_id, direction: direction, coeff: coeff }
 }
 
-pub fn generate_pyramid(mut peak: [f64; 3], ell: f64, id: usize) -> Pyramid
+pub fn generate_pyramid(mut peak: [f64; 3], ell: f64, id: usize, datapoints_x: [f64; 500], datapoints_y: [f64; 500]) -> Pyramid
 {
-    peak[2] = f([peak[0], peak[1]]);
+    peak[2] = f([peak[0], peak[1]], datapoints_x, datapoints_y);
 
     let x1: Array2<f64> = array![
         [peak[0]+1.0, peak[1]+1.0, peak[2] - ell],

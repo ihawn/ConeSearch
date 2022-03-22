@@ -2,14 +2,18 @@ use crate::structs::{Hyperplane, Pyramid, Vector3};
 use std::collections::BinaryHeap;
 use std::error::Error;
 use std::time::Instant;
+use std::vec;
 use crate::pyramid_handler::{generate_pyramid};
 use crate::intersections::{intersect_new_hyperplane, prune_intersections};
 use csv;
-
+use rand::Rng;
 
 pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_threshold: usize, max_iter: usize)
 {
     //init
+    let datapoints = generate_datapoints();
+    let datapoints_x = datapoints.0; let datapoints_y = datapoints.1;
+
     let mut hyperplanes: Vec<Hyperplane> = vec![];
     let mut pyramids: Vec<Pyramid> = vec![];
     let mut intersections: Vec<Vector3> = vec![];  
@@ -20,10 +24,10 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
     let mut ab_diff: Vec<f64> = vec!();
     let mut step_times: Vec<f64> = vec!();
     let mut hyp_count: Vec<usize> = vec!();
-    pyramids.push(generate_pyramid([x_bounds.0, y_bounds.0, 0.0], ell, 0));
-    pyramids.push(generate_pyramid([x_bounds.0, y_bounds.1, 0.0], ell, 1));
-    pyramids.push(generate_pyramid([x_bounds.1, y_bounds.0, 0.0], ell, 2));
-    pyramids.push(generate_pyramid([x_bounds.1, y_bounds.1, 0.0], ell, 3));
+    pyramids.push(generate_pyramid([x_bounds.0, y_bounds.0, 0.0], ell, 0, datapoints_x, datapoints_y));
+    pyramids.push(generate_pyramid([x_bounds.0, y_bounds.1, 0.0], ell, 1, datapoints_x, datapoints_y));
+    pyramids.push(generate_pyramid([x_bounds.1, y_bounds.0, 0.0], ell, 2, datapoints_x, datapoints_y));
+    pyramids.push(generate_pyramid([x_bounds.1, y_bounds.1, 0.0], ell, 3, datapoints_x, datapoints_y));
 
 
     //Add hyperplanes to the list
@@ -46,8 +50,8 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
     {
         let min_loc = min_sect(&intersections);
         let pt = intersections[min_loc];
-        let fx = f([pt.x, pt.y]);
-        let pyr: Pyramid = generate_pyramid([pt.x, pt.y, fx], ell, pyramids.len());
+        let fx = f([pt.x, pt.y], datapoints_x, datapoints_y);
+        let pyr: Pyramid = generate_pyramid([pt.x, pt.y, fx], ell, pyramids.len(), datapoints_x, datapoints_y);
 
         if pt.z > lower_bound { lower_bound = pt.z; }
         if fx < upper_bound 
@@ -81,7 +85,7 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
             println!("\nIteration: {}\nLower Bound: {}\nUpper Bound: {}, \nHyperplane Count: {}, \nIntersection Count: {}, \nx1: {}, x2: {}, \nf(x): {}", i+1, lower_bound, upper_bound, hyperplanes.len(), intersections.len(), best_loc.x, best_loc.y, upper_bound);
         }
 
-        if upper_bound - lower_bound < 0.01 && i > 100
+        if i == max_iter - 1 //upper_bound - lower_bound < 0.00000001 && i > 100
         {
             itt_sols.push([best_loc.x, best_loc.y]);
             ab_diff.push(upper_bound - lower_bound);
@@ -91,7 +95,7 @@ pub fn solve(x_bounds: (f64, f64), y_bounds: (f64, f64), ell: f64, closeness_thr
         }
     }
 
-    let path = "C:/Users/Isaac/Documents/Optimization/NonConvex/NonConvexOptimization/NonConvexOptimiztion/BasinHopping/csv/ConeSearchRastrigin.csv";
+    let path = "C:/Users/Isaac/Documents/Optimization/NonConvex/NonConvexOptimization/NonConvexOptimiztion/BasinHopping/csv/ConeSearchLeastSquares.csv";
     if let Err(e) = write_to_csv(path, itt_sols, ab_diff, step_times, hyp_count)
     {
         eprint!("{}", e);
@@ -137,7 +141,7 @@ fn get_adj_hyperplanes(mut pyrs: Vec<Pyramid>, pyr: Pyramid, adj_size: usize) ->
     (adj, pyrs)
 }
 
-pub fn f(x: [f64; 2]) -> f64
+pub fn f(x: [f64; 2], datapoints_x: [f64; 500], datapoints_y: [f64; 500]) -> f64
 {
     let pi = 3.14159265358979;
     //x[0]*x[0] + x[1]*x[1]
@@ -152,12 +156,64 @@ pub fn f(x: [f64; 2]) -> f64
     //0.5 + (f64::powf(f64::sin(f64::powf(x[0], 2.0) - f64::powf(x[1], 2.0)), 2.0) - 0.5) / f64::powf(1.0 + 0.001*(f64::powf(x[1], 2.0) + f64::powf(x[1], 2.0)), 2.0) //Schaffer N. 2
     //-(f64::sin(x[0])*f64::powf(f64::sin(f64::powf(x[0], 2.0)/pi), 2.0) + f64::sin(x[1])*f64::powf(f64::sin(2.0*f64::powf(x[1], 2.0)/pi), 2.0)) //Michalewicz
     //(f64::powf(f64::powf(x[0], 2.0) + x[1] - 11.0, 2.0) + f64::powf(x[0] + f64::powf(x[1], 2.0) - 7.0, 2.0)) / 1000.0 //Himm
-    20.0 + f64::powf(x[0], 2.0) - 10.0*f64::cos(2.0*pi*x[0]) + f64::powf(x[1], 2.0) - 10.0*f64::cos(2.0*pi*x[1]) //Rastrigin
+    //20.0 + f64::powf(x[0], 2.0) - 10.0*f64::cos(2.0*pi*x[0]) + f64::powf(x[1], 2.0) - 10.0*f64::cos(2.0*pi*x[1]) //Rastrigin
+
+    0.0001 * loss(x, datapoints_x, datapoints_y)
 }
 
 pub fn f2(x: [f64; 2], n: f64) -> f64
 {
     n*(f64::powf(x[0], 2.0) + f64::powf(x[1], 2.0))
+}
+
+pub fn generate_datapoints() -> ([f64; 500], [f64; 500])
+{
+    let mut rng = rand::thread_rng();
+
+    //range is -10, 10
+    let true_a: f64 = 4.0;
+    let true_b: f64 = 6.0;
+    let mut datapoints_x: [f64; 500] = [0.0; 500];
+    let mut datapoints_y: [f64; 500] = [0.0; 500];
+
+    for i in 0..500
+    {
+        datapoints_x[i] = -10.0 + 20.0*(i as f64)/500.0;
+        datapoints_y[i] = model(true_a, true_b, datapoints_x[i]) + rng.gen_range(0.0..3.0)
+    }
+
+    (datapoints_x, datapoints_y)
+}
+
+pub fn model(a: f64, b: f64, x: f64) -> f64
+{
+    a*f64::sin(b*x) + b*f64::cos(a*x)
+}
+
+pub fn f_params(a: f64, b: f64, x_vals: [f64; 500]) -> [f64; 500]
+{
+    let mut f_par: [f64; 500] = [0.0; 500];
+
+    for i in 0..500
+    {
+        f_par[i] = model(a, b, x_vals[i])
+    }
+
+    f_par
+}
+
+pub fn loss(ab: [f64; 2], datapoints_x: [f64; 500], datapoints_y: [f64; 500]) -> f64
+{
+    let mut sum: f64 = 0.0;
+    
+    let mut diff: [f64; 500] = [0.0; 500];
+    let mut params = f_params(ab[0], ab[1], datapoints_x);
+    for i in 0..500
+    {
+        diff[i] = f64::powi(f64::abs(datapoints_y[i] - params[i]), 2);
+        sum += diff[i];
+    }
+    sum
 }
 
 fn write_to_csv(path: &str, xy: Vec<[f64; 2]>, alpha_beta: Vec<f64>, step_time: Vec<f64>, hyp_count: Vec<usize>) -> Result<(), Box<dyn Error>>
